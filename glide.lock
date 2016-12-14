@@ -1,0 +1,6 @@
+hash: 1a59ecd52cdc45b6348f93082073aa174463f6e6cdc9e6fb7cf5aa8d3aa59476
+updated: 2016-12-14T19:14:38.545628197+09:00
+imports: []
+testImports:
+- name: github.com/sclevine/agouti
+  version: da6ce95d89acab048b648c71fb45b57622d3457e

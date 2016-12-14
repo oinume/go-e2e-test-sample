@@ -1,0 +1,3 @@
+package: github.com/oinume/go-e2e-test-sample
+testImport:
+  - package: github.com/sclevine/agouti
