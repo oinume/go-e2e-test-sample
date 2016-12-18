@@ -3,9 +3,8 @@ package e2e
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"net/http/httptest"
-	"os"
-	"strings"
 	"testing"
 
 	"github.com/oinume/go-e2e-test-sample/app"
@@ -25,7 +24,8 @@ func TestMain(m *testing.M) {
 
 func testMain(m *testing.M) error {
 	// Setup HTTP server
-	mux := app.NewServeMux()
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", app.Index)
 	server := httptest.NewServer(mux)
 	defer server.Close()
 	serverURL = server.URL
@@ -46,7 +46,6 @@ func testMain(m *testing.M) error {
 }
 
 func TestIndex(t *testing.T) {
-	fmt.Printf("serverURL = %v\n", serverURL)
 	page, err := webDriver.NewPage()
 	if err != nil {
 		t.Error(err)
@@ -54,17 +53,15 @@ func TestIndex(t *testing.T) {
 	if err := page.Navigate(serverURL); err != nil {
 		t.Error(err)
 	}
-}
-
-func newWebDriver() *agouti.WebDriver {
-	envWebDriver := os.Getenv("WEB_DRIVER")
-	var driver *agouti.WebDriver
-	switch strings.ToLower(envWebDriver) {
-	case "phantomjs":
-		driver = agouti.PhantomJS()
-	default:
-		driver = agouti.ChromeDriver()
+	if err := page.FindByXPath("//input[@name='name']").Fill("test"); err != nil {
+		t.Error(err)
 	}
-	//driver.HTTPClient = client
-	return driver
+	if err := page.FindByXPath("//input[@type='submit']").Submit(); err != nil {
+		t.Error(err)
+	}
+
+	text, _ := page.FindByXPath("//p").Text()
+	if expected, actual := "Hello test", text; expected != actual {
+		t.Errorf("expected = %v, actual = %v", expected, actual)
+	}
 }
